@@ -26,15 +26,15 @@ app.use(bodyParser);
 app.use(douane.middleware()); // Douane's middleware works for Express and Restify
 
 // Define a custom validation method
-Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(value, min) {
-    return value.match(/,/g).length >= min;
+Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(context, min) {
+    return (context.value) ? value.match(/,/g).length >= min : false;
 });
 
 // Define asynchronous validation
-Douane.setAsyncValidator('isUniqueUserId', 'Must be unique', function(context, milliseconds, done) {
+Douane.setAsyncValidator('isUniqueUserId', 'Must be unique', function(context, done) {
     setTimeout(function() {
         done(null, context.value == 'success');
-    }, milliseconds);
+    }, 100);
 });
 
 app.post('/:url', function(req, res, next) {
@@ -51,12 +51,46 @@ app.post('/:url', function(req, res, next) {
          .isRequired()
          .isString();
 
-    // Call the request validation method and check the result
-    req.validate(function(errors) {
-        console.log(errors);
+    // Validate callback return serious (say database) errors in first argument, normal validation errors in second arg
+	// Second argument
+    req.validate(function(err, validationErrors) {
+        console.log(validationErrors);
     });
  });
  ```
+
+# Custom validators
+
+Define a synchronous validator like this:
+
+```
+Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(context, min) {
+    return (context.value) ? value.match(/,/g).length >= min : false;
+});
+```
+
+The context object contains the following properties:
+
+```
+{
+	req: <object>, // The request object
+    setter: <function>, // Retrieves the parameter root object
+    param: <string>, // The locator string relative to setter root
+    finished: <boolean>, // When setting this to true any subsequent checks are skipped
+    value: <value> // The value being validated
+}
+```
+
+Defining an asynchronous validator is similar to a synchronous except the return value should be passed in a callback. The first callback argument can be used for non-validation errors (e.g. database error), the second callback argument should return a boolean.
+
+```
+Douane.setAsyncValidator('asyncTest', 'Must be unique', function(context, milliseconds, done) {
+    setTimeout(function() {
+        done(null, context.value == 'success');
+    }, milliseconds);
+});
+```
+
 
 # FAQ
 

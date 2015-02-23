@@ -37,27 +37,33 @@ describe('Douane', function() {
             req.checkBody('array[].isString').optional().isString();
             req.checkBody('array[].isInt').required().isInt();
             req.checkBody('array[].isMin').notEmpty().isMin(10);
+            req.checkBody('array[].isMax').optional().isMax(10);
+            req.checkBody('array').minElements(4);
             req.validate(function(err, results) { res.json(results); });
         });
 
+        var arrayValue = [
+            {
+                isNumeric: '123',
+                isString: 'string',
+                isInt: 2,
+                isMin: 10,
+                isMax: 10
+            },
+            {
+                isNumeric: 'invalid',
+                isString: 123,
+                isInt: 1.5,
+                isMin: 9,
+                isMax: 11
+            },
+            {
+                isNumeric: 'invalid'
+            }
+        ];
+
         request(this.app).post('/test').send({
-            array: [
-                {
-                    isNumeric: '123',
-                    isString: 'string',
-                    isInt: 2,
-                    isMin: 10
-                },
-                {
-                    isNumeric: 'invalid',
-                    isString: 123,
-                    isInt: 1.5,
-                    isMin: 9
-                },
-                {
-                    isNumeric: 'invalid'
-                }
-            ]
+            array: arrayValue
         })
         .end(function(err, res) {
             assert.deepEqual(res.body, [
@@ -67,7 +73,9 @@ describe('Douane', function() {
                 { param: 'array[2].isInt', msg: 'Is required' },
                 { param: 'array[1].isInt', msg: 'Must be an integer', value: 1.5 },
                 { param: 'array[2].isMin', msg: 'Cannot be empty' },
-                { param: 'array[1].isMin', msg: 'Must be at least 10', value: 9 }
+                { param: 'array[1].isMin', msg: 'Must be at least 10', value: 9 },
+                { param: 'array[1].isMax', msg: 'Can\'t be more than 10', value: 11 },
+                { param: 'array', msg: 'Must contain at least 4 elements', value: arrayValue }
             ]);
             done();
         });
