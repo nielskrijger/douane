@@ -11,7 +11,7 @@ This validation library is inspired by [express-validator](https://github.com/ct
 
 ## Usage
 
-```
+```javascript
 var Douane = require('douane');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -70,7 +70,7 @@ app.listen(3000);
 
 Define a synchronous validator like this:
 
-```
+```javascript
 Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(context, min) {
     return (context.value) ? value.match(/,/g).length >= min : false;
 });
@@ -90,7 +90,7 @@ The context object contains the following properties:
 
 Defining an asynchronous validator is similar to a synchronous except the return value should be passed to a callback function. The first callback argument should contain non-validation errors (e.g. a database error), the second callback argument should return a boolean.
 
-```
+```javascript
 Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}', function(context, milliseconds, done) {
     setTimeout(function() {
         done(null, context.value == 'success');
