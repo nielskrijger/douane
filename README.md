@@ -1,5 +1,7 @@
 # Douane
 
+[![Build Status via Travis CI](https://travis-ci.org/nielskrijger/douane.png?branch=master)](https://travis-ci.org/nielskrijger/douane)
+
 **This library is still being developed and while release version number is > 0.0 backwards-incompatible changes may be introduced for each release. You should not specify "~0.0.x" or something similar in your package.json, use "0.0.X" instead.**
 
 This validation library is inspired by [express-validator](https://github.com/ctavan/express-validator) and adds the following features:
