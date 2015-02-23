@@ -41,6 +41,7 @@ describe('Douane', function() {
             req.checkBody('array[].minLength').optional().minLength(4);
             req.checkBody('array[].maxLength').optional().maxLength(5);
             req.checkBody('array[].length').optional().length(3, 8);
+            req.checkBody('array[].isEmail').optional().isEmail();
             req.checkBody('array').minElements(4);
             req.validate(function(err, results) { res.json(results); });
         });
@@ -54,7 +55,8 @@ describe('Douane', function() {
                 isMax: 10,
                 minLength: '1234',
                 maxLength: '12345',
-                length: '123'
+                length: '123',
+                isEmail: 'test@example.org'
             },
             {
                 isNumeric: 'invalid',
@@ -64,7 +66,8 @@ describe('Douane', function() {
                 isMax: 11,
                 minLength: '123',
                 maxLength: '123456',
-                length: '12'
+                length: '12',
+                isEmail: 'test@example'
             },
             {
                 isNumeric: 'invalid',
@@ -89,6 +92,7 @@ describe('Douane', function() {
                 { param: 'array[1].maxLength', msg: 'Must contain no more than 5 characters', value: '123456' },
                 { param: 'array[1].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '12' },
                 { param: 'array[2].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '123456789' },
+                { param: 'array[1].isEmail', msg: 'Valid email required', value: 'test@example' },
                 { param: 'array', msg: 'Must contain at least 4 elements', value: arrayValue }
             ]);
             done();
