@@ -1,6 +1,6 @@
 # Douane
 
-[![Build Status via Travis CI](https://travis-ci.org/nielskrijger/douane.png?branch=master)](https://travis-ci.org/nielskrijger/douane)
+[![Build Status](https://travis-ci.org/nielskrijger/douane.svg?branch=master)](https://travis-ci.org/nielskrijger/douane)
 
 **This library is still being developed and while release version number is > 0.0 backwards-incompatible changes may be introduced for each release. You should not specify "~0.0.x" or something similar in your package.json, use "0.0.X" instead.**
 
