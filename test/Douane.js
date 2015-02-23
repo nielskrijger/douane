@@ -38,6 +38,9 @@ describe('Douane', function() {
             req.checkBody('array[].isInt').required().isInt();
             req.checkBody('array[].isMin').notEmpty().isMin(10);
             req.checkBody('array[].isMax').optional().isMax(10);
+            req.checkBody('array[].minLength').optional().minLength(4);
+            req.checkBody('array[].maxLength').optional().maxLength(5);
+            req.checkBody('array[].length').optional().length(3, 8);
             req.checkBody('array').minElements(4);
             req.validate(function(err, results) { res.json(results); });
         });
@@ -48,17 +51,24 @@ describe('Douane', function() {
                 isString: 'string',
                 isInt: 2,
                 isMin: 10,
-                isMax: 10
+                isMax: 10,
+                minLength: '1234',
+                maxLength: '12345',
+                length: '123'
             },
             {
                 isNumeric: 'invalid',
                 isString: 123,
                 isInt: 1.5,
                 isMin: 9,
-                isMax: 11
+                isMax: 11,
+                minLength: '123',
+                maxLength: '123456',
+                length: '12'
             },
             {
-                isNumeric: 'invalid'
+                isNumeric: 'invalid',
+                length: '123456789'
             }
         ];
 
@@ -75,6 +85,10 @@ describe('Douane', function() {
                 { param: 'array[2].isMin', msg: 'Cannot be empty' },
                 { param: 'array[1].isMin', msg: 'Must be at least 10', value: 9 },
                 { param: 'array[1].isMax', msg: 'Can\'t be more than 10', value: 11 },
+                { param: 'array[1].minLength', msg: 'Must contain at least 4 characters', value: '123' },
+                { param: 'array[1].maxLength', msg: 'Must contain no more than 5 characters', value: '123456' },
+                { param: 'array[1].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '12' },
+                { param: 'array[2].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '123456789' },
                 { param: 'array', msg: 'Must contain at least 4 elements', value: arrayValue }
             ]);
             done();
