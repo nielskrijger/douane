@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/nielskrijger/douane.svg?branch=master)](https://travis-ci.org/nielskrijger/douane) [![Coverage Status](https://coveralls.io/repos/nielskrijger/douane/badge.svg?branch=master)](https://coveralls.io/r/nielskrijger/douane?branch=master)
 
-**This library is quite new and be aware any release version starting with `0.0.*` may introduce backwards-incompatible changes. To be safe do not specify `~0.0.*` or something similar in your package.json, use `0.0.*` instead.**
-
 This validation library is inspired by [express-validator](https://github.com/ctavan/express-validator) and adds the following features:
 
 - Asynchronous validations.
