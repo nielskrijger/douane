@@ -1,30 +1,30 @@
 # Douane
 
-[![Build Status](https://travis-ci.org/nielskrijger/douane.svg?branch=master)](https://travis-ci.org/nielskrijger/douane) [![Coverage Status](https://coveralls.io/repos/nielskrijger/douane/badge.svg)](https://coveralls.io/r/nielskrijger/douane)
+[![Build Status](https://travis-ci.org/nielskrijger/douane.svg?branch=master)](https://travis-ci.org/nielskrijger/douane) [![Coverage Status](https://coveralls.io/repos/nielskrijger/douane/badge.svg?branch=master)](https://coveralls.io/r/nielskrijger/douane?branch=master)
 
-**This library is still being developed and while release version number is > 0.0 backwards-incompatible changes may be introduced for each release. You should not specify "~0.0.x" or something similar in your package.json, use "0.0.X" instead.**
+**This library is quite new and be aware any release version starting with `0.0.*` may introduce backwards-incompatible changes. To be safe do not specify `~0.0.*` or something similar in your package.json, use `0.0.*` instead.**
 
 This validation library is inspired by [express-validator](https://github.com/ctavan/express-validator) and adds the following features:
 
 - Asynchronous validations.
 - Default error messages can be overridden (e.g. internationalization).
 - Error message format is fully customizable.
-- Array parameters can be validated.
+- Array elements can be validated.
 
 ## Usage
 
 ```
-var Douane = require('Douane');
+var Douane = require('douane');
+var express = require('express');
+var bodyParser = require('body-parser');
 
 // Override the default error messages, error formatter and result formatter if you want to
 var douane = new Douane({
-    errorFormatter: errorFormatter(ctx, msg, args) { ... },
-    resultFormatter: resultFormatter(errors) { ... },
     errorMessages: { isString: 'Override default error message' }
 });
 
 var app = express();
-app.use(bodyParser);
+app.use(bodyParser.json());
 app.use(douane.middleware()); // Douane's middleware works for Express and Restify
 
 // Define a custom validation method
@@ -39,26 +39,33 @@ Douane.setAsyncValidator('isUniqueUserId', 'Must be unique', function(context, d
     }, 100);
 });
 
-app.post('/:url', function(req, res, next) {
-    // This Validation contains multiple checks that are evaluated sequentially, stopping at the first one that fails.
+app.post('/', function(req, res, next) {
+    // A validation sequence like the one below stops at the first check that fails.
     req.checkBody('id')
-        .isRequired() // uses default error message
-        .isInt('isRequired') // use custom error message
-        .isMin(0) // some validators may expect one or more arguments
-        .isMax(10, 'Should be no more than {0}') // the last value is used as error message
+        .required() // Uses default error message
+        .isInt('This is a custom error message') // Use custom error message
+        .isMin(0) // Some validators may expect one or more arguments
+        .isMax(10, 'Should be no more than {0}') // The last value is used as error message
         .isUniqueUserId(); // A custom asynchronous function
 
-    // Define as many validations on as many properties as you want, including arrays!
-    req.checkBody('array[].name')
-         .isRequired()
-         .isString();
+    // Multiple validations are evaluated in parallel
+    req.checkBody('array')
+        .minElements(1);
 
-    // Validate callback return serious (say database) errors in first argument, normal validation errors in second arg
-	// Second argument
+    // Validate objects elements in an array with the postfix '[]'
+    req.checkBody('array[].name')
+        .required()
+        .isString();
+
+    // Callback accepts two arguments, the first contains non-validation errors and the second an array of validation errors.
     req.validate(function(err, validationErrors) {
         console.log(validationErrors);
+        res.json(validationErrors);
     });
- });
+});
+
+app.listen(3000);
+
  ```
 
 # Custom validators
@@ -83,10 +90,10 @@ The context object contains the following properties:
 }
 ```
 
-Defining an asynchronous validator is similar to a synchronous except the return value should be passed in a callback. The first callback argument can be used for non-validation errors (e.g. database error), the second callback argument should return a boolean.
+Defining an asynchronous validator is similar to a synchronous except the return value should be passed to a callback function. The first callback argument should contain non-validation errors (e.g. a database error), the second callback argument should return a boolean.
 
 ```
-Douane.setAsyncValidator('asyncTest', 'Must be unique', function(context, milliseconds, done) {
+Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}', function(context, milliseconds, done) {
     setTimeout(function() {
         done(null, context.value == 'success');
     }, milliseconds);
