@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/nielskrijger/douane.svg?branch=master)](https://travis-ci.org/nielskrijger/douane) [![Coverage Status](https://coveralls.io/repos/nielskrijger/douane/badge.svg?branch=master)](https://coveralls.io/r/nielskrijger/douane?branch=master)
 
-This validation library is inspired by [express-validator](https://github.com/ctavan/express-validator) and adds the following features:
+This validation library is inspired by [express-validator](https://github.com/ctavan/express-validator) and has the following features:
 
-- Asynchronous validations.
+- Synchronous and asynchronous validations.
 - Default error messages can be overridden (e.g. internationalization).
 - Error message format is fully customizable.
 - Array elements can be validated.
@@ -29,7 +29,7 @@ app.post('/', function(req, res, next) {
         .isInt('This is a custom error message') // Use custom error message
         .isMin(0) // Some validators may expect one or more arguments
         .isMax(10, 'Should be no more than {0}') // The last value is used as error message
-        .isUniqueUserId(); // A custom asynchronous function
+        .isUniqueUserId(); // A custom asynchronous validator
 
     // Multiple validations are evaluated in parallel
     req.checkBody('array')
@@ -41,15 +41,43 @@ app.post('/', function(req, res, next) {
         .isString();
 
     // Callback accepts two arguments, the first contains non-validation errors and the second an array of validation errors.
-    req.validate(function(err, validationErrors) {
-        console.log(validationErrors);
-        res.json(validationErrors);
+    req.validate(function(err, result) {
+        console.log(result);
+        res.json(result);
     });
 });
 
 app.listen(3000);
 
  ```
+
+# Available sanitizers & validators
+
+Validators:
+
+* **optional**: won't validate further if value is null or undefined without throwing an error.
+* **required**: fails if value is null or undefined.
+* **notEmpty**: fails if value is null, undefined, '', {} or [].
+* **isNumeric**: value must be a string containing a numeric value.
+* **isString**: value must be a string.
+* **isInt**: value must be a whole number.
+* **isMin(min)**: value must be at least specified minimum number.
+* **isMax(max)**: value must be more than specified maximum number.
+* **minLength(minLength)**: value must be a string with at least the specified number of characters.
+* **maxLength(maxLength)**: value must be a string with at most specified number of characters.
+* **length(minLength, maxLength)**: value must be a string with at least the minimum and at most the specified maximum number of characters.
+* **isEmail()**: value must be a valid email.
+* **minElements(minElements)**: value must be an array with at least specified number of elements.
+* **maxElements(maxElements)**: value must be an array with at most specified number of elements.
+
+Sanitizers:
+
+* **toUpper**: convert string to uppercase.
+* **toLower**: convert string to lowercase.
+* **trim**: removes whitespace from both ends of a string. Whitespace is all whitespace characters (space, tab, etc.) and line terminators.
+* **trimRight**: removes whitespace from the right end of the string.
+* **trimLeft**: removes whitespace from the left end of the string.
+
 
 # Custom validator
 
@@ -87,7 +115,8 @@ Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}',
 
 **Tips:**
 
-* If the context value is an incorrect type, `null` or `undefined` you should fail the validation. If you need optional parameters use `.optional()` as the first validation check.
+* If the context value is an incorrect type, null or undefined you should fail the validation. If you need optional parameters use `.optional()` as the first validation check.
+* All validator arguments are always mandatory as the final (optional) argument is interpreted as an error message override.
 
 # Custom sanitizer
 
@@ -104,7 +133,7 @@ Here too be aware the context value may be empty or an incorrect type in which c
 
 **Tips:**
 
-* If the context value is an incorrect type, `null` or `undefined` you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the chain.
+* If the context value is an incorrect type, null or undefined you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the chain.
 
 # Douane options
 

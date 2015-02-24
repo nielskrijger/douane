@@ -43,6 +43,7 @@ describe('Douane', function() {
             req.checkBody('array[].length').optional().length(3, 8);
             req.checkBody('array[].isEmail').optional().isEmail();
             req.checkBody('array').minElements(4);
+            req.checkBody('array').maxElements(2);
             req.validate(function(err, results) { res.json(results); });
         });
 
@@ -93,7 +94,8 @@ describe('Douane', function() {
                 { param: 'array[1].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '12' },
                 { param: 'array[2].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '123456789' },
                 { param: 'array[1].isEmail', msg: 'Valid email required', value: 'test@example' },
-                { param: 'array', msg: 'Must contain at least 4 elements', value: arrayValue }
+                { param: 'array', msg: 'Must contain at least 4 elements', value: arrayValue },
+                { param: 'array', msg: 'Must contain no more than 2 elements', value: arrayValue }
             ]);
             done();
         });
