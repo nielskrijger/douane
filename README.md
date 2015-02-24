@@ -66,9 +66,9 @@ Validators:
 * **minLength(minLength)**: value must be a string with at least the specified number of characters.
 * **maxLength(maxLength)**: value must be a string with at most specified number of characters.
 * **length(minLength, maxLength)**: value must be a string with at least the minimum and at most the specified maximum number of characters.
-* **isEmail()**: value must be a valid email.
+* **isEmail**: value must be a valid email.
 * **minElements(minElements)**: value must be an array with at least specified number of elements.
-* **maxElements(maxElements)**: value must be an array with at most specified number of elements.
+* **maxElements(maxElements)**: value must be an array with no more than specified maximum number of elements.
 
 Sanitizers:
 
@@ -116,7 +116,7 @@ Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}',
 **Tips:**
 
 * If the context value is an incorrect type, null or undefined you should fail the validation. If you need optional parameters use `.optional()` as the first validation check.
-* All validator arguments are always mandatory as the final (optional) argument is interpreted as an error message override.
+* Any validator argument is always mandatory because the final (optional) argument is interpreted as an error message override.
 
 # Custom sanitizer
 
@@ -133,7 +133,7 @@ Here too be aware the context value may be empty or an incorrect type in which c
 
 **Tips:**
 
-* If the context value is an incorrect type, null or undefined you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the chain.
+* If the context value is an incorrect type, null or undefined you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the validation chain.
 
 # Douane options
 
