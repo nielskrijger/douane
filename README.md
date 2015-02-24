@@ -16,26 +16,11 @@ var Douane = require('douane');
 var express = require('express');
 var bodyParser = require('body-parser');
 
-// Override the default error messages, error formatter and result formatter if you want to
-var douane = new Douane({
-    errorMessages: { isString: 'Override default error message' }
-});
+var douane = new Douane();
 
 var app = express();
 app.use(bodyParser.json());
 app.use(douane.middleware()); // Douane's middleware works for Express and Restify
-
-// Define a custom validation method
-Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(context, min) {
-    return (context.value) ? value.match(/,/g).length >= min : false;
-});
-
-// Define asynchronous validation
-Douane.setAsyncValidator('isUniqueUserId', 'Must be unique', function(context, done) {
-    setTimeout(function() {
-        done(null, context.value == 'success');
-    }, 100);
-});
 
 app.post('/', function(req, res, next) {
     // A validation sequence like the one below stops at the first check that fails.
@@ -66,13 +51,15 @@ app.listen(3000);
 
  ```
 
-# Custom validators
+# Custom validator
 
-Define a synchronous validator like this:
+Validators are defined globally so make sure their names are unique. 
+
+Define a validator like this:
 
 ```javascript
 Douane.setValidator('hasMinCommas', 'Should contain at least {0} commas', function(context, min) {
-    return (context.value) ? value.match(/,/g).length >= min : false;
+    return (context.value) ? context.value.match(/,/g).length >= min : false;
 });
 ```
 
@@ -88,7 +75,7 @@ The context object contains the following properties:
 }
 ```
 
-Defining an asynchronous validator is similar to a synchronous except the return value should be passed to a callback function. The first callback argument should contain non-validation errors (e.g. a database error), the second callback argument should return a boolean.
+Defining an asynchronous validator is similar to a synchronous validator except the return value should be passed to a callback function. The first callback argument should contain non-validation errors (e.g. a database error), the second callback argument should return a boolean.
 
 ```javascript
 Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}', function(context, milliseconds, done) {
@@ -98,6 +85,63 @@ Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}',
 });
 ```
 
+**Tips:**
+
+* If the context value is an incorrect type, `null` or `undefined` you should fail the validation. If you need optional parameters use `.optional()` as the first validation check.
+
+# Custom sanitizer
+
+Sanitizers work much the same way as validators except they return a new value:
+
+```javascript
+Douane.setSanitizer('toUpper', function(context) {
+    return (context.value && _.isString(context.value)) ? context.value.toUpperCase() : context.value;
+});
+```
+
+Here too be aware the context value may be empty or an incorrect type in which case you should return `null`.
+
+
+**Tips:**
+
+* If the context value is an incorrect type, `null` or `undefined` you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the chain.
+
+# Douane options
+
+Available options are:
+
+```javascript
+
+// Override the default error messages, error formatter and result formatter if you want to
+var douane = new Douane({
+
+	// Override default error message
+    errorMessages: { 
+		isString: 'Must be a string',
+		isArray: 'Must be an array 
+	},
+
+	// Change error format
+	errorFormatter: function(context, msg, args) {
+   		for (var i = 0, max = args.length; i < max; i++) {
+        	msg = msg.replace('{' + i + '}', args[i]);
+    	}
+   		return {
+        	param: context.param,
+        	msg: msg,
+        	value: context.value
+    	};
+	},
+
+	// Change final output
+	resultFormatter: function(errors) {
+    	if (!errors || errors.length === 0) {
+        	return null;
+    	}
+    	return errors;
+	}
+});
+```
 
 # FAQ
 
@@ -107,11 +151,7 @@ This library offers three features that you might find interesting; 1) beter con
 
 **Why is this library called Douane?**
 
-All other proper names were already taken. Douane is the Dutch word for customs authority which seemed fitting (input/output, checks... you get it?). Also, it's a funny word having so many vowels in it.
-
-**Why use JavaScript rather than CoffeeScript, TypeScript, < whatever >...?**
-
-JavaScript is broken (given the thousand attempt to build alternatives), but for a lot of work it works just fine. Here too.toms authority which seemed fitting (whilst discussing it over a glass of beer... input/output, checks... you get it?). Also, it's a funny word having so many vowels in it.
+All other proper names were already taken. Douane is the Dutch word for customs authority which seemed somewhat fitting (input/output, checks...). If nothing else it is a funny word :-)
 
 **Why use JavaScript rather than CoffeeScript, TypeScript, < whatever >...?**
 
