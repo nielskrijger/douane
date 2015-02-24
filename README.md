@@ -53,7 +53,7 @@ app.listen(3000);
 
 # Custom validator
 
-Validators are defined globally so make sure their names are unique. 
+Validators are defined globally so make sure their names are unique.
 
 Define a validator like this:
 
@@ -116,9 +116,9 @@ Available options are:
 var douane = new Douane({
 
 	// Override default error message
-    errorMessages: { 
+    errorMessages: {
 		isString: 'Must be a string',
-		isArray: 'Must be an array 
+		isArray: 'Must be an array'
 	},
 
 	// Change error format
@@ -155,4 +155,4 @@ All other proper names were already taken. Douane is the Dutch word for customs 
 
 **Why use JavaScript rather than CoffeeScript, TypeScript, < whatever >...?**
 
-JavaScript is broken (given the thousand attempt to build alternatives), but for a lot of work it works just fine. Here too.
+JavaScript is broken (given the thousand attempts to build alternatives), but for a lot of work it works just fine. Here too.
