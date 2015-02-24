@@ -25,20 +25,21 @@ app.use(douane.middleware()); // Douane's middleware works for Express and Resti
 app.post('/', function(req, res, next) {
     // A validation sequence like the one below stops at the first check that fails.
     req.checkBody('id')
-        .required() // Uses default error message
+        .optional() // Uses default error message
         .isInt('This is a custom error message') // Use custom error message
-        .isMin(0) // Some validators may expect one or more arguments
+        .isMin(0) // Some validators require one or more arguments
         .isMax(10, 'Should be no more than {0}') // The last value is used as error message
         .isUniqueUserId(); // A custom asynchronous validator
 
     // Multiple validations are evaluated in parallel
     req.checkBody('array')
+        .required()
         .minElements(1);
 
     // Validate objects elements in an array with the postfix '[]'
-    req.checkBody('array[].name')
+    req.checkBody('array[].email')
         .required()
-        .isString();
+        .isEmail();
 
     // Callback accepts two arguments, the first contains non-validation errors and the second an array of validation errors.
     req.validate(function(err, result) {
