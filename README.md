@@ -121,7 +121,7 @@ The context object contains the following properties:
 	req: <object>, // The request object
     setter: <function>, // Retrieves the parameter root object
     param: <string>, // The locator string relative to setter root
-    finished: <boolean>, // When setting this to true any subsequent checks are skipped
+    finished: <boolean>, // When true any subsequent checks are skipped
     value: <value> // The value being validated
 }
 ```
