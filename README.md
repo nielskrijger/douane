@@ -79,6 +79,7 @@ Validators:
 * **notEmpty**: fails if value is null, undefined, '', {} or [].
 * **isNumeric**: value must be a string containing a numeric value.
 * **isString**: value must be a string.
+* **isBoolean**: value must be a boolean.
 * **isNumber**: value must be a number.
 * **isInt**: value must be a whole number.
 * **isMin(min)**: value must be at least specified minimum number.
