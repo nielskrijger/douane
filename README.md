@@ -52,7 +52,25 @@ app.listen(3000);
 
  ```
 
-# Available sanitizers & validators
+## Installation
+
+```
+npm install --save douane
+```
+
+## Test & lint
+
+Requires [gulp](http://gulpjs.com/).
+
+```
+gulp build
+```
+or without lint:
+```
+gulp test
+```
+
+## Available sanitizers & validators
 
 Validators:
 
@@ -61,9 +79,12 @@ Validators:
 * **notEmpty**: fails if value is null, undefined, '', {} or [].
 * **isNumeric**: value must be a string containing a numeric value.
 * **isString**: value must be a string.
+* **isNumber**: value must be a number.
 * **isInt**: value must be a whole number.
 * **isMin(min)**: value must be at least specified minimum number.
 * **isMax(max)**: value must be more than specified maximum number.
+* **isArray**: value must be an array.
+* **isObject**: value must be an object. Note JavaScript arrays are objects, while strings and numbers are not.
 * **minLength(minLength)**: value must be a string with at least the specified number of characters.
 * **maxLength(maxLength)**: value must be a string with at most specified number of characters.
 * **length(minLength, maxLength)**: value must be a string with at least the minimum and at most the specified maximum number of characters.
@@ -80,7 +101,7 @@ Sanitizers:
 * **trimLeft**: removes whitespace from the left end of the string.
 
 
-# Custom validator
+## Custom validator
 
 Validators are defined globally so make sure their names are unique.
 
@@ -119,7 +140,7 @@ Douane.setAsyncValidator('asyncTest', 'Value must be "success", timeout in {0}',
 * If the context value is an incorrect type, null or undefined you should fail the validation. If you need optional parameters use `.optional()` as the first validation check.
 * Any validator argument is always mandatory because the final (optional) argument is interpreted as an error message override.
 
-# Custom sanitizer
+## Custom sanitizer
 
 Sanitizers work much the same way as validators except they return a new value:
 
@@ -136,7 +157,7 @@ Here too be aware the context value may be empty or an incorrect type in which c
 
 * If the context value is an incorrect type, null or undefined you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the validation chain.
 
-# Douane options
+## Options
 
 Available options are:
 

@@ -34,10 +34,14 @@ describe('Douane', function() {
         this.app.post('/test', function(req, res) {
             req.checkBody('optional').optional().isNumeric();
             req.checkBody('array[].isNumeric').isNumeric();
+            req.checkBody('array[].isBoolean').optional().isBoolean();
             req.checkBody('array[].isString').optional().isString();
+            req.checkBody('array[].isNumber').optional().isNumber();
             req.checkBody('array[].isInt').required().isInt();
             req.checkBody('array[].isMin').notEmpty().isMin(10);
             req.checkBody('array[].isMax').optional().isMax(10);
+            req.checkBody('array[].isArray').optional().isArray();
+            req.checkBody('array[].isObject').optional().isObject();
             req.checkBody('array[].minLength').optional().minLength(4);
             req.checkBody('array[].maxLength').optional().maxLength(5);
             req.checkBody('array[].length').optional().length(3, 8);
@@ -50,10 +54,14 @@ describe('Douane', function() {
         var arrayValue = [
             {
                 isNumeric: '123',
+                isBoolean: false,
                 isString: 'string',
+                isNumber: -3.61235,
                 isInt: 2,
                 isMin: 10,
                 isMax: 10,
+                isArray: ['test'],
+                isObject: { test: 'test' },
                 minLength: '1234',
                 maxLength: '12345',
                 length: '123',
@@ -61,10 +69,14 @@ describe('Douane', function() {
             },
             {
                 isNumeric: 'invalid',
+                isBoolean: 'false',
                 isString: 123,
+                isNumber: '1.0',
                 isInt: 1.5,
                 isMin: 9,
                 isMax: 11,
+                isArray: 'test',
+                isObject: 'test',
                 minLength: '123',
                 maxLength: '123456',
                 length: '12',
@@ -72,7 +84,8 @@ describe('Douane', function() {
             },
             {
                 isNumeric: 'invalid',
-                length: '123456789'
+                length: '123456789',
+                isObject: ['Array is also an object'],
             }
         ];
 
@@ -83,12 +96,16 @@ describe('Douane', function() {
             assert.deepEqual(res.body, [
                 { param: 'array[1].isNumeric', msg: 'Must be a numeric value', value: 'invalid' },
                 { param: 'array[2].isNumeric', msg: 'Must be a numeric value', value: 'invalid' },
+                { param: 'array[1].isBoolean', msg: 'Must be a boolean', value: 'false' },
                 { param: 'array[1].isString', msg: 'Must be a string', value: 123 },
+                { param: 'array[1].isNumber', msg: 'Must be a number', value: '1.0' },
                 { param: 'array[2].isInt', msg: 'Is required' },
                 { param: 'array[1].isInt', msg: 'Must be an integer', value: 1.5 },
                 { param: 'array[2].isMin', msg: 'Cannot be empty' },
                 { param: 'array[1].isMin', msg: 'Must be at least 10', value: 9 },
                 { param: 'array[1].isMax', msg: 'Can\'t be more than 10', value: 11 },
+                { param: 'array[1].isArray', msg: 'Must be an array', value: 'test' },
+                { param: 'array[1].isObject', msg: 'Must be an object', value: 'test' },
                 { param: 'array[1].minLength', msg: 'Must contain at least 4 characters', value: '123' },
                 { param: 'array[1].maxLength', msg: 'Must contain no more than 5 characters', value: '123456' },
                 { param: 'array[1].length', msg: 'Must be at least 3 and no more than 8 characters long', value: '12' },
