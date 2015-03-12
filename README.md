@@ -151,9 +151,6 @@ Douane.setSanitizer('toUpper', function(context) {
 });
 ```
 
-Here too be aware the context value may be empty or an incorrect type in which case you should return `null`.
-
-
 **Tips:**
 
 * If the context value is an incorrect type, null or undefined you should return the original value. Changing the value to `null` or something else may break validators or sanitizers further down the validation chain.
